@@ -1,0 +1,54 @@
+/* Couche d'animation -- purement visuelle, vanilla CSS. N'affecte jamais
+   les donnees, le scoring ni les couleurs fonctionnelles (definies dans
+   tokens.css). Rapide, sobre, sans rebond ni rotation. */
+
+/* --- Apparition progressive (cartes KPI, lignes de tableau) --- */
+.reveal{
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity 320ms ease, transform 320ms ease;
+  transition-delay:var(--reveal-delay, 0ms);
+}
+.reveal.is-visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* --- Badges de risque : apparition douce a chaque montage --- */
+@keyframes badge-in{
+  from{opacity:0; transform:scale(.92);}
+  to{opacity:1; transform:scale(1);}
+}
+.badge{ animation:badge-in 220ms ease both; }
+
+/* --- Carte : fondu au chargement de la vue --- */
+@keyframes map-in{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+/* --- Etat de chargement (liste clients scores) --- */
+.skeleton-bar{
+  display:inline-block;
+  height:11px;
+  border-radius:2px;
+  background:linear-gradient(90deg, var(--panel-2) 25%, #ECECEC 37%, var(--panel-2) 63%);
+  background-size:400% 100%;
+  animation:skeleton-shimmer 1.4s ease infinite;
+}
+@keyframes skeleton-shimmer{
+  0%{background-position:100% 0;}
+  100%{background-position:0 0;}
+}
+
+/* --- Confort utilisateur : neutralise toutes les animations/transitions --- */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:0.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.001ms !important;
+    scroll-behavior:auto !important;
+  }
+  .reveal{ opacity:1; transform:none; }
+  .gn-map{ opacity:1; }
+}
