@@ -1,1 +1,1 @@
-export const API_OM_URL = "https://api-orange-money-churn.onrender.com";
+export const API_OM_URL = "https://api-orange-guinee-om.onrender.com";
