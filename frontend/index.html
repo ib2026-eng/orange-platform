@@ -140,7 +140,6 @@
   <!-- FICHE CLIENT -->
   <div class="view" id="client">
     <div class="view-header"><h1>Fiche client</h1><p>Profil, score et recommandation par client</p></div>
-    <div class="honesty"><b>Fiche client —</b> recherche parmi les clients du dataset actif, scorés par l'API réelle. Les champs marqués « indisponible » n'existent pas dans les données actuellement fournies — aucune valeur n'est inventée à leur place (voir <code>docs/DATA_HONESTY_POLICY.md</code>).</div>
 
     <div class="client-search">
       <input type="text" id="clientSearchInput" placeholder="Rechercher un client (ex. PT240037.1001.800013)" value="PT240037.1001.800013">
@@ -177,7 +176,7 @@
   <!-- CLIENTS À RISQUE -->
   <div class="view" id="list">
     <div class="view-header"><h1>Clients à risque</h1><p>Liste priorisée, causes et actions recommandées</p></div>
-    <div class="honesty"><b>API réelle connectée —</b> les clients du dataset actif sont scorés par une API réelle (FastAPI, déployée). Le modèle actuel est un <b style="color:var(--orange);">placeholder</b> (règle simple, pas un modèle entraîné sur de vraies données) — à remplacer dès que l'identifiant client sera corrigé, sans changer le reste du pipeline.</div>
+    <div class="honesty"><b>API réelle connectée —</b> les clients du dataset actif sont scorés par une API réelle (FastAPI, déployée) : modèle réel (baseline v0, montant_moyen, AUC 0.60) si disponible, sinon règle simple documentée en repli.</div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <span class="panel-label" style="margin-bottom:0;">CLIENTS À RISQUE — SCORE, CAUSE, RECOMMANDATION, PRIORITÉ</span>
@@ -216,7 +215,6 @@
   <!-- SEGMENTATION -->
   <div class="view" id="loyalty">
     <div class="view-header"><h1>Segmentation</h1><p>Valeur et comportement par segment RFM</p></div>
-    <div class="honesty" id="segHonesty"><b>Segmentation RFM —</b> calculée réellement (Récence = inactivité, Fréquence = transactions, Montant = montant moyen, Diversité = types de service) sur le dataset actif. Ces 4 dimensions servent uniquement à la segmentation métier — <b>elles ne sont pas les variables du modèle de churn</b> (baseline v0, montant_moyen, AUC 0.60).</div>
 
     <div id="segEmpty" class="panel"><div class="map-info-empty">Chargement des clients en cours...</div></div>
 
@@ -264,11 +262,10 @@
       </div>
 
       <div class="panel" style="margin-top:18px;">
-        <span class="panel-label">CE QU'ON NE CONSTRUIT PAS (SANS DONNÉES D'EXPÉRIENCE)</span>
-        <div style="font-size:12.5px;color:var(--grey);line-height:1.7;">
-          ✕ Impact chiffré d'un programme de fidélité (nécessite un test A/B réel)<br>
-          ✕ Points distribués / membres actifs (aucun programme de points existant)<br>
-          ✕ ROI de campagne (nécessite un historique de campagnes déjà menées)
+        <div class="locked-panel">
+          <div class="glyph">🔒</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);margin-bottom:8px;">V2 — Segmentation enrichie (données d'expérience)</div>
+          <div class="glyph2">Impact chiffré d'un programme de fidélité, points distribués, ROI de campagne — disponibles lorsque nous disposons d'un historique de campagnes réel. Rien n'est simulé en attendant.</div>
         </div>
       </div>
     </div>
