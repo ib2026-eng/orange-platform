@@ -17,7 +17,7 @@
 
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true"><span class="brand-dot"></span></span>
+      <img src="assets/orange-logo.png" alt="Orange Guinée" class="brand-logo">
       <div class="brand-text">
         <div class="brand-name">Orange Guinée</div>
         <div class="brand-product">Customer Intelligence</div>
@@ -28,7 +28,6 @@
 
   <div class="tabs">
     <div class="tab active" data-view="global">Vue globale</div>
-    <div class="tab" data-view="churn">Churn IA</div>
     <div class="tab" data-view="client">Fiche client</div>
     <div class="tab" data-view="list">Clients à risque</div>
     <div class="tab" data-view="loyalty">Segmentation</div>
@@ -138,22 +137,6 @@
     </div>
   </div>
 
-  <!-- CHURN IA -->
-  <div class="view" id="churn">
-    <div class="view-header"><h1>Churn IA</h1><p>Statut et transparence du modèle de scoring</p></div>
-    <div class="honesty"><b>Statut du modèle —</b> <span id="churnStatutTexte">Chargement du statut réel via l'API...</span></div>
-    <div class="kpi-row">
-      <div class="kpi"><div class="val" id="churnAucVal">—</div><div class="lbl">AUC (aire sous la courbe ROC)</div></div>
-      <div class="kpi"><div class="val" id="churnVariablesVal">—</div><div class="lbl">Variable(s) utilisée(s)</div></div>
-      <div class="kpi"><div class="val" id="churnPeriodeVal">—</div><div class="lbl">Période d'entraînement</div></div>
-      <div class="kpi"><div class="val">Règle</div><div class="lbl">Méthode d'explication (pas de SHAP simulé)</div></div>
-    </div>
-    <div class="panel">
-      <span class="panel-label" id="churnFacteursTitre">FACTEURS DU MODÈLE</span>
-      <div id="churnFacteurs"></div>
-    </div>
-  </div>
-
   <!-- FICHE CLIENT -->
   <div class="view" id="client">
     <div class="view-header"><h1>Fiche client</h1><p>Profil, score et recommandation par client</p></div>
@@ -178,7 +161,7 @@
           <div class="health-num" id="clientScoreNum">—</div>
           <div>
             <span class="badge" id="clientScoreBadge"></span>
-            <div style="font-size:11.5px; color:var(--grey); line-height:1.5; margin-top:6px;">Score calculé par le modèle réel connecté (voir l'onglet Churn IA pour le détail du modèle).</div>
+            <div style="font-size:11.5px; color:var(--grey); line-height:1.5; margin-top:6px;">Score calculé par le modèle réel connecté (baseline v0, montant_moyen, AUC 0.60).</div>
           </div>
         </div>
 
@@ -233,7 +216,7 @@
   <!-- SEGMENTATION -->
   <div class="view" id="loyalty">
     <div class="view-header"><h1>Segmentation</h1><p>Valeur et comportement par segment RFM</p></div>
-    <div class="honesty" id="segHonesty"><b>Segmentation RFM —</b> calculée réellement (Récence = inactivité, Fréquence = transactions, Montant = montant moyen, Diversité = types de service) sur le dataset actif. Ces 4 dimensions servent uniquement à la segmentation métier — <b>elles ne sont pas les variables du modèle de churn</b> (voir l'onglet Churn IA).</div>
+    <div class="honesty" id="segHonesty"><b>Segmentation RFM —</b> calculée réellement (Récence = inactivité, Fréquence = transactions, Montant = montant moyen, Diversité = types de service) sur le dataset actif. Ces 4 dimensions servent uniquement à la segmentation métier — <b>elles ne sont pas les variables du modèle de churn</b> (baseline v0, montant_moyen, AUC 0.60).</div>
 
     <div id="segEmpty" class="panel"><div class="map-info-empty">Chargement des clients en cours...</div></div>
 
