@@ -6,16 +6,20 @@
 .journey-row{display:flex;flex-direction:column;gap:11px;}
 .journey-step{display:flex;align-items:center;gap:12px;}
 .journey-bar-track{flex:1;background:var(--panel-2);border-radius:0;height:24px;overflow:hidden;position:relative;border:1px solid var(--line);}
-.journey-bar-fill{height:100%;display:flex;align-items:center;padding-left:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#fff;font-weight:600;transition:width 500ms cubic-bezier(.22,.61,.36,1);}
+.journey-bar-fill{height:100%;display:flex;align-items:center;padding-left:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#fff;font-weight:600;white-space:nowrap;transition:width 500ms cubic-bezier(.22,.61,.36,1);}
 .journey-lbl{width:120px;font-size:12.5px;color:var(--ink);flex-shrink:0;}
+@media (max-width:560px){
+  .journey-step{flex-direction:column;align-items:stretch;gap:4px;}
+  .journey-lbl{width:auto;}
+}
 
 /* client 360 */
 .client-search{display:flex;gap:0;margin-bottom:22px;border:1px solid var(--line-strong);}
 .client-search input{flex:1;background:var(--paper);border:none;color:var(--ink);padding:12px 16px;font-size:13.5px;font-family:'Inter',sans-serif;}
 .client-search input:focus{outline:none;background:var(--panel-2);}
 .client-search button{background:var(--orange);border:none;color:#fff;font-weight:700;padding:0 22px;cursor:pointer;font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;transition:background-color 150ms ease, transform 150ms ease;}
-.client-search button:hover{background:#E36D00;}
-.client-search button:active{transform:scale(.98);}
+.client-search button:hover{background:#E36D00;transform:translateY(-1px);}
+.client-search button:active{transform:translateY(0) scale(.98);}
 
 .health-gauge-wrap{display:flex;align-items:center;gap:20px;}
 .health-num{font-family:'Space Grotesk',sans-serif;font-size:46px;font-weight:700;color:var(--ink);letter-spacing:-1px;}
@@ -32,9 +36,12 @@
 .trend-chart{width:100%;height:auto;max-height:220px;display:block;}
 .trend-dots circle{fill:var(--ink);stroke:var(--paper);stroke-width:2;}
 .trend-labels text{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--grey);text-anchor:middle;}
-.gn-map{width:100%;height:auto;max-height:460px;display:block;margin:0 auto;opacity:0;animation:map-in 400ms ease forwards;animation-delay:60ms;}
-.region-shape{stroke:var(--paper);stroke-width:1;transition:opacity .15s ease,stroke .15s ease,fill .2s ease;cursor:pointer;}
-.region-shape:hover{stroke:var(--orange);stroke-width:1.6;}
+.gn-map{width:100%;height:auto;max-height:460px;display:block;margin:0 auto;opacity:0;animation:map-in 400ms ease forwards;animation-delay:230ms;}
+.region-shape{stroke:var(--paper);stroke-width:1;transform-box:fill-box;transform-origin:center;transition:opacity 300ms ease,stroke 300ms ease,fill 300ms ease,transform 300ms ease,filter 300ms ease;cursor:pointer;}
+.region-shape:hover{stroke:var(--orange);stroke-width:1.6;transform:translateY(-2px) scale(1.008);filter:brightness(1.05) drop-shadow(0 3px 6px rgba(10,10,10,.18));}
+.region-shape.selectionnee{transform:translateY(-6px) scale(1.015);filter:brightness(1.05) drop-shadow(0 6px 10px rgba(10,10,10,.28));stroke:var(--orange);stroke-width:2;}
+.region-shape.estompee{opacity:.4;}
+.region-shape.filtree{opacity:.12;}
 .region-shape.r-faible{fill:var(--r0);}
 .region-shape.r-moyen{fill:var(--r1);}
 .region-shape.r-eleve{fill:var(--r2);}
@@ -53,6 +60,39 @@
 .map-info-head .rname{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.5px;text-transform:uppercase;}
 .map-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;animation:fade 200ms ease;}
 @media (max-width:700px){.map-info-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* Carte premium -- filtres, tooltip, classement, Regional Insight (Phase 4) */
+.map-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.map-filter-btn{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.3px;text-transform:uppercase;color:var(--grey);background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:5px 14px;cursor:pointer;transition:background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);}
+.map-filter-btn:hover{border-color:var(--orange);color:var(--ink);transform:translateY(-1px);}
+.map-filter-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.map-reset-btn{margin-left:auto;}
+
+.map-tooltip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;padding:10px 14px;border-radius:2px;font-size:11.5px;line-height:1.5;opacity:0;transform:translateY(4px);transition:opacity var(--transition-fast), transform var(--transition-fast);z-index:10;max-width:220px;}
+.map-tooltip.visible{opacity:1;transform:translateY(0);}
+.map-tooltip-titre{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12.5px;margin-bottom:4px;letter-spacing:.2px;}
+.map-tooltip-ligne{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#D8D8D8;}
+
+.ranking-row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);cursor:pointer;transition:background-color var(--transition-fast);}
+.ranking-row:last-child{border-bottom:none;}
+.ranking-row:hover{background:var(--panel-2);}
+.ranking-rang{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);width:20px;flex-shrink:0;}
+.ranking-nom{flex:1;font-size:12.5px;color:var(--ink);}
+.ranking-valeur{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+
+.regional-subhead{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.2px;color:var(--grey);text-transform:uppercase;margin-bottom:8px;}
+
+/* Clients a risque -- barre d'outils (Phase 5) */
+.list-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.list-filters{display:flex;gap:8px;flex-wrap:wrap;}
+.list-search-input{flex:1;min-width:160px;border:1px solid var(--line-strong);padding:8px 12px;font-size:12.5px;font-family:'Inter',sans-serif;border-radius:var(--radius);background:var(--paper);color:var(--ink);transition:background-color var(--transition-fast);}
+.list-search-input:focus{outline:none;background:var(--panel-2);}
+.list-sort-select{border:1px solid var(--line-strong);padding:8px 10px;font-size:11.5px;font-family:'JetBrains Mono',monospace;border-radius:var(--radius);background:var(--paper);color:var(--ink);cursor:pointer;}
+.list-pagination{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px;}
+.list-pagination-info{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);}
+
+/* Fiche client (Phase 6) */
+.cause-highlight{background:var(--panel-2);border-left:3px solid var(--orange);padding:10px 14px;font-size:13px;color:var(--ink);font-weight:700;}
 .map-info-stat .v{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--ink);}
 .map-info-stat .l{font-size:10.5px;color:var(--grey);margin-top:3px;}
 
@@ -60,8 +100,88 @@
 .list-table-wrap{max-height:520px;overflow-y:auto;}
 table.list-table{width:100%;border-collapse:collapse;font-size:12.5px;}
 table.list-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.8px;padding:9px 10px;border-bottom:1px solid var(--line-strong);position:sticky;top:0;background:var(--paper);text-transform:uppercase;}
-table.list-table td{padding:10px;border-bottom:1px solid var(--line);color:var(--ink);transition:background-color 150ms ease;}
-table.list-table tr:hover td{background:var(--panel-2);}
+table.list-table td{padding:10px;border-bottom:1px solid var(--line);color:var(--ink);transition:background-color 150ms ease, transform 150ms ease;}
+table.list-table tbody tr{cursor:pointer;}
+table.list-table tr:hover td{background:var(--panel-2);transform:translateX(2px);}
+table.list-table tr.selectionnee td{background:#FF790014;}
 .score-bar-wrap{display:flex;align-items:center;gap:8px;}
 .score-bar-track{width:70px;background:var(--panel-2);border-radius:0;height:6px;overflow:hidden;border:1px solid var(--line);}
 .score-bar-fill{height:100%;border-radius:0;transition:width 400ms ease;}
+
+/* Data Import (section 9-15) */
+.dropzone{border:1.5px dashed var(--line-strong);border-radius:var(--radius);padding:40px 24px;text-align:center;transition:border-color var(--transition-fast), background-color var(--transition-fast);cursor:pointer;}
+.dropzone:hover,.dropzone:focus-visible,.dropzone.dragover{border-color:var(--orange);background:var(--panel-2);outline:none;}
+.dropzone-icon{font-size:22px;color:var(--orange);margin-bottom:8px;}
+.dropzone-text{font-size:14px;color:var(--ink);margin-bottom:4px;}
+.dropzone-formats{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);letter-spacing:.3px;margin-bottom:18px;text-transform:uppercase;}
+
+.pipeline-stepper{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:14px;}
+.pipeline-step{flex:1;background:var(--paper);padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);text-align:center;text-transform:uppercase;letter-spacing:.3px;transition:background-color var(--transition-normal), color var(--transition-normal);}
+.pipeline-step.actif{color:var(--orange);font-weight:700;}
+.pipeline-step.fait{background:var(--ink);color:#fff;}
+.upload-progress-track{background:var(--panel-2);border:1px solid var(--line);height:6px;overflow:hidden;}
+.upload-progress-fill{height:100%;background:var(--orange);transition:width var(--transition-fast);}
+.pipeline-status-text{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);margin-top:8px;}
+
+.import-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+
+.import-ready{display:flex;align-items:center;gap:16px;}
+.import-ready-check{width:36px;height:36px;border-radius:50%;background:var(--risk-faible);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.import-ready-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--ink);}
+.import-ready-detail{font-size:12.5px;color:var(--grey);margin-top:2px;}
+
+.data-quality-warning{font-size:12.5px;color:var(--risk-modere);padding:6px 0;}
+.data-quality-error{font-size:12.5px;color:var(--risk-critique);padding:6px 0;}
+
+/* Graphique de tendance -- Vue globale, data-driven (section 3-4) */
+.trend-chart-wrap{position:relative;}
+.trend-chart-svg{width:100%;height:auto;display:block;}
+.trend-line{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.trend-tooltip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;padding:8px 12px;border-radius:2px;font-size:11px;line-height:1.5;opacity:0;transform:translate(-50%,-100%) translateY(-8px);transition:opacity var(--transition-fast);white-space:nowrap;z-index:5;}
+.trend-tooltip.visible{opacity:1;}
+.trend-tooltip-titre{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;margin-bottom:2px;}
+.trend-tooltip-valeur{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#D8D8D8;}
+
+/* Etats vides professionnels (section 15) */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:220px;padding:44px 24px;gap:8px;}
+.empty-state-titre{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:var(--ink);}
+.empty-state-texte{color:var(--grey);font-size:13px;max-width:420px;line-height:1.6;}
+.empty-state-cta{margin-top:12px;}
+
+/* ============================================================
+   RESPONSIVE -- audit reel (1440/1280/1024/768/390/375), section 8-10
+============================================================ */
+
+/* Tablette (<=1024px) : listes/segmentation restent 2 colonnes, KPI passent
+   en 2x2 pour eviter l'ecrasement des chiffres. */
+@media (max-width:1024px){
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .map-info-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* Tablette portrait / grand mobile (<=768px) */
+@media (max-width:768px){
+  .shell{padding:24px 16px 70px;}
+  .grid2{grid-template-columns:1fr;}
+  .list-toolbar{flex-direction:column;align-items:stretch;}
+  .list-filters{justify-content:flex-start;}
+  .list-search-input{width:100%;}
+  .map-reset-btn{margin-left:0;}
+}
+
+/* Mobile (<=480px) : KPI en une colonne pour ne jamais casser les chiffres,
+   en-tetes de panneau empiles plutot que juxtaposes. */
+@media (max-width:480px){
+  .kpi-row{grid-template-columns:1fr;}
+  .kpi .val{font-size:clamp(20px,7vw,26px);}
+  .grid2 > div[style*="justify-content:space-between"],
+  .panel > div[style*="justify-content:space-between"]{flex-direction:column;align-items:flex-start !important;gap:10px;}
+  .map-legend-inline{gap:10px;}
+  .brand-product{display:none;}
+}
+
+/* Tableaux : defilement horizontal maitrise plutot que colonnes coupees ou
+   texte superpose (section 10) -- jamais overflow:hidden qui masquerait du
+   contenu. */
+.list-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table.list-table{min-width:640px;}

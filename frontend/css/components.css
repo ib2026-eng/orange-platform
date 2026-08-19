@@ -41,3 +41,14 @@ tr:hover td{background:var(--panel-2);}
 .locked-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;color:var(--grey);text-align:center;}
 .locked-panel .glyph{font-size:26px;margin-bottom:12px;opacity:.4;}
 .locked-panel .glyph2{max-width:420px;font-size:12.5px;line-height:1.6;}
+
+/* Boutons generiques -- reutilises par Data Import et les phases suivantes
+   (import en masse, validation, etc.). Meme langage visuel que
+   .client-search button (orange plein / contour encre). */
+.btn-primary{background:var(--orange);border:1px solid var(--orange);color:#fff;font-weight:700;padding:10px 20px;cursor:pointer;font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;border-radius:var(--radius);transition:background-color var(--transition-fast), transform var(--transition-fast);}
+.btn-primary:hover{background:#E36D00;transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0) scale(.98);}
+.btn-primary:disabled{background:var(--grey);border-color:var(--grey);cursor:not-allowed;opacity:.6;transform:none;}
+.btn-secondary{background:var(--paper);border:1px solid var(--line-strong);color:var(--ink);font-weight:700;padding:10px 20px;cursor:pointer;font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;border-radius:var(--radius);transition:background-color var(--transition-fast), transform var(--transition-fast);}
+.btn-secondary:hover{background:var(--panel-2);transform:translateY(-1px);}
+.btn-secondary:active{transform:translateY(0) scale(.98);}

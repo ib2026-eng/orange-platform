@@ -23,4 +23,11 @@
   --safe:var(--risk-faible); --risk:var(--risk-critique); --mid:var(--risk-modere);
 
   --radius:2px;
+
+  /* Durees de transition partagees -- V2 premium (section 44). Reprennent
+     les durees deja utilisees ponctuellement dans animations.css/views.css,
+     centralisees ici pour que toute nouvelle regle s'y reference. */
+  --transition-fast:150ms ease;
+  --transition-normal:250ms ease;
+  --transition-slow:400ms ease;
 }

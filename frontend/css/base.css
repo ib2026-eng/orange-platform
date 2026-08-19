@@ -3,15 +3,20 @@ html,body{margin:0;padding:0;}
 body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
 .shell{max-width:1280px;margin:0 auto;padding:32px 24px 90px;}
 
-/* topbar */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:18px;border-bottom:1px solid var(--line-strong);}
-.brand{display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:2.5px;color:var(--ink);font-weight:700;}
-.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--orange);}
-.status-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);border:1px solid var(--line);padding:5px 11px;border-radius:20px;letter-spacing:.3px;}
+/* topbar -- header premium, sobre, noir/blanc, accent orange minimal */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--line-strong);flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{width:34px;height:34px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--orange);}
+.brand-text{display:flex;flex-direction:column;line-height:1.2;}
+.brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15.5px;color:var(--ink);letter-spacing:-.2px;}
+.brand-product{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.8px;text-transform:uppercase;color:var(--grey);margin-top:2px;}
+.status-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);border:1px solid var(--line);padding:5px 11px;border-radius:20px;letter-spacing:.3px;white-space:nowrap;}
 
-h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(28px,3.6vw,40px);margin:26px 0 6px;letter-spacing:-1px;line-height:1.05;}
-h1 em{color:var(--orange);font-style:normal;}
-.subtitle{color:var(--grey);font-size:14.5px;max-width:640px;line-height:1.5;margin-bottom:30px;}
+/* en-tete court par vue -- "qu'est-ce que je regarde" (section 7) */
+.view-header{margin:0 0 20px;}
+.view-header h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(21px,2.4vw,27px);margin:0 0 4px;letter-spacing:-.4px;line-height:1.15;}
+.view-header p{color:var(--grey);font-size:13.5px;margin:0;}
 
 /* nav tabs */
 .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line-strong);margin-bottom:28px;flex-wrap:wrap;}

@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import get_settings
+from .domains.orange_money.ingestion.router import router as ingestion_router
 from .domains.orange_money.router import router as orange_money_router
 
 settings = get_settings()
@@ -28,3 +29,4 @@ app.add_middleware(
 )
 
 app.include_router(orange_money_router)
+app.include_router(ingestion_router)

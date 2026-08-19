@@ -1,37 +1,21 @@
-import { fetchScoresBatch, scoreLocalement } from '../api.js';
 import { couleurPourCategorie } from '../risk-colors.js';
-import { hashSeed, seededRandom } from '../random.js';
 import { revealStagger, prefersReducedMotion } from '../animations.js';
+import { ORDRE_CAUSES, getRetentionRecommendation } from '../retention.js';
+import { obtenirRoster, obtenirEtatRoster } from '../client-store.js';
+import { markupPourEtat, cablerBoutonImport } from '../empty-states.js';
 
-const REGIONS_GN = ['Boké', 'Faranah', 'Kankan', 'Kindia', 'Labé', 'Mamou', 'Nzérékoré', 'Conakry'];
-const ACTIONS_PAR_CATEGORIE = {
-  'Critique': "Cashback marchand 5%",
-  'Élevé': "Contact support prioritaire",
-  'Modéré': "Offre découverte paiement marchand",
-  'Faible': "Suivi standard",
-};
+const ORDRE_RISQUE = ['Critique', 'Élevé', 'Modéré', 'Faible'];
+const PRIORITE_EMOJI = { Critique: '🔴', Élevé: '🟠', Modéré: '🟡', Faible: '🟢' };
+const LIGNES_PAR_PAGE = 25;
 
-function genererClientsFictifs() {
-  const clients = [];
-  for (let i = 1; i <= 100; i++) {
-    const id = `PT${240000 + i * 37}.${1000 + i}.${800000 + i * 13}`;
-    const rnd = seededRandom(hashSeed(id));
-    const total_transactions = Math.round(1 + rnd() * 40);
-    const nb_types_service = Math.round(1 + rnd() * 7);
-    const jours_inactivite_avant_mars = Math.round(rnd() * 89);
-    const montant_moyen = Math.round(5000 + rnd() * 300000);
-    const region = REGIONS_GN[Math.floor(rnd() * 1000) % REGIONS_GN.length];
-    clients.push({
-      id, region, total_transactions, nb_types_service,
-      jours_inactivite_avant_mars, montant_moyen,
-      montant_total: montant_moyen * total_transactions,
-    });
-  }
-  return clients;
-}
+let filtreRisque = 'tous';
+let termeRecherche = '';
+let tri = 'score-desc';
+let pageActuelle = 1;
+let clientsPageActuelle = new Map();
 
 function renderSkeleton(tbody, n = 8) {
-  const largeurs = [120, 70, 90, 60, 140];
+  const largeurs = [120, 70, 60, 60, 110, 140, 40];
   tbody.innerHTML = Array.from({ length: n }, () => `
     <tr class="skeleton-row">
       ${largeurs.map(l => `<td><span class="skeleton-bar" style="width:${l}px;"></span></td>`).join('')}
@@ -39,64 +23,166 @@ function renderSkeleton(tbody, n = 8) {
   `).join('');
 }
 
-function renderListe(clientsAvecScore, { clientListBody, listSummary }) {
-  clientsAvecScore.sort((a, b) => b.probabilite_churn - a.probabilite_churn);
-  const nbRisque = clientsAvecScore.filter(c => c.prediction_churn === 1).length;
-  listSummary.textContent = `${nbRisque} à risque élevé/critique`;
-
-  clientListBody.innerHTML = "";
-  const lignes = clientsAvecScore.map(c => {
-    const color = couleurPourCategorie(c.niveau_risque);
-    const pct = Math.round(c.probabilite_churn * 100);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
+function ligneHtml(c) {
+  const color = couleurPourCategorie(c.niveau_risque);
+  const pct = Math.round(c.probabilite_churn * 100);
+  return `
+    <tr data-client-id="${c.id}">
       <td style="font-family:'JetBrains Mono',monospace; font-size:11px;">${c.id}</td>
       <td>${c.region}</td>
+      <td><span class="badge" style="background:${color}26; color:${color};">${c.niveau_risque}</span></td>
       <td>
         <div class="score-bar-wrap">
           <div class="score-bar-track"><div class="score-bar-fill" data-target-width="${pct}%" style="width:0%; background:${color};"></div></div>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:${color};">${pct}%</span>
         </div>
       </td>
-      <td><span class="badge" style="background:${color}26; color:${color};">${c.niveau_risque}</span></td>
-      <td style="font-size:12px; color:var(--grey);">${ACTIONS_PAR_CATEGORIE[c.niveau_risque] || '—'}</td>
-    `;
-    clientListBody.appendChild(tr);
-    return tr;
-  });
+      <td style="font-size:12px; color:var(--ink);">${c.reco.cause}</td>
+      <td style="font-size:12px;">
+        <div style="color:var(--ink);">${c.reco.action}</div>
+        <div style="font-size:10.5px; color:var(--grey); margin-top:2px; line-height:1.4;">${c.reco.pourquoi}</div>
+      </td>
+      <td style="text-align:center; font-size:14px;" title="Priorité ${c.niveau_risque}">${PRIORITE_EMOJI[c.niveau_risque] || ''}</td>
+    </tr>
+  `;
+}
 
+function renderPagination(elements, totalResultats, totalPages) {
+  if (!elements.pagination) return;
+  if (totalPages <= 1) { elements.pagination.innerHTML = ''; return; }
+  elements.pagination.innerHTML = `
+    <button type="button" class="btn-secondary" id="listPagePrev" ${pageActuelle === 1 ? 'disabled' : ''}>‹ Précédent</button>
+    <span class="list-pagination-info">Page ${pageActuelle} / ${totalPages} · ${totalResultats} résultat(s)</span>
+    <button type="button" class="btn-secondary" id="listPageNext" ${pageActuelle === totalPages ? 'disabled' : ''}>Suivant ›</button>
+  `;
+  document.getElementById('listPagePrev')?.addEventListener('click', () => {
+    pageActuelle = Math.max(1, pageActuelle - 1);
+    render(elements);
+  });
+  document.getElementById('listPageNext')?.addEventListener('click', () => {
+    pageActuelle = Math.min(totalPages, pageActuelle + 1);
+    render(elements);
+  });
+}
+
+function render(elements) {
+  const { etat, message } = obtenirEtatRoster();
+
+  if (etat === 'chargement') {
+    elements.toolbar.style.display = 'none';
+    renderSkeleton(elements.clientListBody);
+    elements.pagination.innerHTML = '';
+    elements.listSummary.textContent = '';
+    return;
+  }
+  if (etat !== 'pret') {
+    elements.toolbar.style.display = 'none';
+    elements.clientListBody.innerHTML = `<tr><td colspan="7">${markupPourEtat(etat, message)}</td></tr>`;
+    cablerBoutonImport(elements.clientListBody);
+    elements.pagination.innerHTML = '';
+    elements.listSummary.textContent = '';
+    return;
+  }
+  elements.toolbar.style.display = '';
+
+  let resultats = obtenirRoster().map(c => ({ ...c, reco: getRetentionRecommendation(c) }));
+
+  if (filtreRisque !== 'tous') resultats = resultats.filter(c => c.niveau_risque === filtreRisque);
+  if (termeRecherche) {
+    const terme = termeRecherche.toLowerCase();
+    resultats = resultats.filter(c => c.id.toLowerCase().includes(terme) || c.region.toLowerCase().includes(terme));
+  }
+
+  switch (tri) {
+    case 'priorite': resultats.sort((a, b) => ORDRE_RISQUE.indexOf(a.niveau_risque) - ORDRE_RISQUE.indexOf(b.niveau_risque)); break;
+    case 'cause': resultats.sort((a, b) => ORDRE_CAUSES.indexOf(a.reco.cause) - ORDRE_CAUSES.indexOf(b.reco.cause)); break;
+    case 'region': resultats.sort((a, b) => a.region.localeCompare(b.region)); break;
+    default: resultats.sort((a, b) => b.probabilite_churn - a.probabilite_churn);
+  }
+
+  const nbRisque = obtenirRoster().filter(c => c.prediction_churn === 1).length;
+  elements.listSummary.textContent = `${nbRisque} à risque élevé/critique · ${resultats.length} correspondant(s)`;
+
+  if (resultats.length === 0) {
+    elements.clientListBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--grey); padding:24px;">Aucun client ne correspond à ces critères.</td></tr>`;
+    clientsPageActuelle = new Map();
+    renderPagination(elements, 0, 1);
+    return;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(resultats.length / LIGNES_PAR_PAGE));
+  pageActuelle = Math.min(Math.max(1, pageActuelle), totalPages);
+  const debut = (pageActuelle - 1) * LIGNES_PAR_PAGE;
+  const pageResultats = resultats.slice(debut, debut + LIGNES_PAR_PAGE);
+
+  clientsPageActuelle = new Map(pageResultats.map(c => [c.id, c]));
+  elements.clientListBody.innerHTML = pageResultats.map(ligneHtml).join('');
+  renderPagination(elements, resultats.length, totalPages);
+
+  const lignes = Array.from(elements.clientListBody.querySelectorAll('tr'));
   revealStagger(lignes, { step: 8, maxStagger: 20 });
 
   const appliquerLargeursCibles = () => {
-    clientListBody.querySelectorAll('.score-bar-fill').forEach(fill => {
-      fill.style.width = fill.dataset.targetWidth;
-    });
+    elements.clientListBody.querySelectorAll('.score-bar-fill').forEach(fill => { fill.style.width = fill.dataset.targetWidth; });
   };
-  if (prefersReducedMotion()) {
-    appliquerLargeursCibles();
-  } else {
-    requestAnimationFrame(() => requestAnimationFrame(appliquerLargeursCibles));
-  }
+  if (prefersReducedMotion()) appliquerLargeursCibles();
+  else requestAnimationFrame(() => requestAnimationFrame(appliquerLargeursCibles));
 }
 
-export async function initListe() {
-  const clientListBody = document.getElementById('clientListBody');
-  const listSummary = document.getElementById('listSummary');
-  const listApiStatus = document.getElementById('listApiStatus');
-  if (!clientListBody) return;
+function debounce(fn, delai) {
+  let handle;
+  return (...args) => { clearTimeout(handle); handle = setTimeout(() => fn(...args), delai); };
+}
 
-  renderSkeleton(clientListBody);
+function reinitialiserPageEtRender(elements) {
+  pageActuelle = 1;
+  render(elements);
+}
 
-  const clientsBruts = genererClientsFictifs();
-  try {
-    const fusion = await fetchScoresBatch(clientsBruts);
-    renderListe(fusion, { clientListBody, listSummary });
-    listApiStatus.textContent = "✓ Scores calculés via l'API (modèle placeholder)";
-    listApiStatus.style.color = "#0A0A0A";
-  } catch (err) {
-    const fictifs = scoreLocalement(clientsBruts);
-    renderListe(fictifs, { clientListBody, listSummary });
-    listApiStatus.textContent = "⚠ API indisponible (mise en veille probable) — scores calculés localement, patientez puis rechargez";
-    listApiStatus.style.color = "#5C5C5C";
-  }
+function cablerBarreOutils(elements) {
+  document.getElementById('listFilters')?.querySelectorAll('.map-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filtreRisque = btn.dataset.filtreRisque;
+      document.querySelectorAll('#listFilters .map-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+      reinitialiserPageEtRender(elements);
+    });
+  });
+
+  const recherche = document.getElementById('listSearchInput');
+  recherche?.addEventListener('input', debounce(() => {
+    termeRecherche = recherche.value.trim();
+    reinitialiserPageEtRender(elements);
+  }, 200));
+
+  const trieur = document.getElementById('listSortSelect');
+  trieur?.addEventListener('change', () => { tri = trieur.value; reinitialiserPageEtRender(elements); });
+
+  document.getElementById('importClientsBtn')?.addEventListener('click', () => {
+    document.querySelector('.tab[data-view="import"]')?.click();
+  });
+
+  elements.clientListBody.addEventListener('click', (e) => {
+    const tr = e.target.closest('tr[data-client-id]');
+    if (!tr) return;
+    const client = clientsPageActuelle.get(tr.dataset.clientId);
+    if (!client) return;
+    elements.clientListBody.querySelectorAll('tr.selectionnee').forEach(r => r.classList.remove('selectionnee'));
+    tr.classList.add('selectionnee');
+    document.dispatchEvent(new CustomEvent('client:select', { detail: { id: client.id } }));
+    document.querySelector('.tab[data-view="client"]')?.click();
+  });
+}
+
+export function initListe() {
+  const elements = {
+    clientListBody: document.getElementById('clientListBody'),
+    listSummary: document.getElementById('listSummary'),
+    pagination: document.getElementById('listPagination'),
+    toolbar: document.querySelector('#list .list-toolbar'),
+  };
+  if (!elements.clientListBody) return;
+
+  cablerBarreOutils(elements);
+  render(elements);
+  document.addEventListener('roster:ready', () => render(elements));
 }

@@ -27,6 +27,49 @@
   to{opacity:1;}
 }
 
+/* --- Graphique de tendance : ligne qui se dessine, aire qui se revele,
+   points qui apparaissent en cascade (section 33) --- */
+@keyframes trend-draw{ to{ stroke-dashoffset:0; } }
+@keyframes trend-fade-in{ to{ opacity:1; } }
+.trend-line{
+  stroke-dasharray:900;
+  stroke-dashoffset:900;
+  animation:trend-draw 900ms ease forwards;
+  animation-delay:120ms;
+}
+.trend-fill{
+  fill:var(--ink);
+  fill-opacity:.07;
+  stroke:none;
+  opacity:0;
+  animation:trend-fade-in 500ms ease forwards;
+  animation-delay:500ms;
+}
+.trend-point{
+  opacity:0;
+  fill:var(--ink);
+  stroke:var(--paper);
+  stroke-width:2;
+  cursor:pointer;
+  animation:badge-in 260ms ease forwards;
+  transition:r var(--transition-fast), fill var(--transition-fast);
+}
+.trend-point:hover, .trend-point.actif{ r:5.5; fill:var(--orange); }
+
+/* --- Grille / axes du graphique de tendance --- */
+.trend-grid-line{ stroke:var(--line); stroke-width:1; }
+.trend-axis-label{ font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--grey); }
+
+/* --- Panneaux de type "modale" (Data Import) : apparition marquee,
+   rejoue naturellement a chaque bascule display:none -> block --- */
+@keyframes panel-in{
+  from{opacity:0; transform:scale(.98) translateY(6px);}
+  to{opacity:1; transform:scale(1) translateY(0);}
+}
+#importPipelinePanel, #importResultPanel, #importReadyPanel{
+  animation:panel-in var(--transition-slow) ease;
+}
+
 /* --- Etat de chargement (liste clients scores) --- */
 .skeleton-bar{
   display:inline-block;
@@ -51,4 +94,7 @@
   }
   .reveal{ opacity:1; transform:none; }
   .gn-map{ opacity:1; }
+  .trend-line{ stroke-dashoffset:0; }
+  .trend-fill{ opacity:1; }
+  .trend-point{ opacity:1; }
 }

@@ -1,14 +1,23 @@
 import { initTabs } from './tabs.js';
 import { initMap } from './map.js';
+import { initClientStore } from './client-store.js';
+import { initVueGlobale } from './views/global.js';
 import { initListe } from './views/list.js';
-import { animateCountUp, animateBarsIn, revealStagger } from './animations.js';
+import { initSegmentation } from './views/loyalty.js';
+import { initNba } from './views/nba.js';
+import { initDataImport } from './views/data-import.js';
+import { initFicheClient } from './views/client.js';
 
 initTabs();
-
-/* Vue globale : deja visible au chargement -> animations d'entree immediates. */
-revealStagger(document.querySelectorAll('#global .kpi'), { step: 60 });
-document.querySelectorAll('#global .kpi .val').forEach(el => animateCountUp(el));
-animateBarsIn(document.querySelectorAll('#global .journey-bar-fill'));
-
 initMap();
+
+// Source unique de verite : charge le dataset actif une fois, chaque vue
+// s'abonne a 'roster:ready' et se met a jour independamment.
+initClientStore();
+
+initVueGlobale();
 initListe();
+initSegmentation();
+initNba();
+initDataImport();
+initFicheClient();

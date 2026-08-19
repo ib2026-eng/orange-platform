@@ -36,3 +36,5 @@ jobs:
           node-version: "20"
       - name: Verifier la syntaxe de chaque module JS
         run: find js -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Tests unitaires (segmentation, Next Best Action)
+        run: node --test tests/*.test.js

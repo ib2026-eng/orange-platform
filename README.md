@@ -22,6 +22,7 @@ docs/       Architecture, contrat API, politique data
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — arborescence, responsabilités, flux
 - [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md) — contrat gelé frontend/backend
 - [`docs/DATA_HONESTY_POLICY.md`](docs/DATA_HONESTY_POLICY.md) — règles données réelles vs fictives
+- [`docs/SECURITY.md`](docs/SECURITY.md) — journalisation, suppression des données, limites connues
 
 ## Lancer en local
 
