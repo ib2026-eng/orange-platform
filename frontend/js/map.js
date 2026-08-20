@@ -1,10 +1,22 @@
 import { couleurPourClasseCarte } from './risk-colors.js';
-import { genererStatsPrefecture } from './regional-stats.js';
+import { regrouperClientsParRegion, calculerStatsRegion, normaliserNomRegion } from './regional-stats.js';
+import { obtenirRoster, obtenirEtatRoster } from './client-store.js';
 import { animateBarsIn } from './animations.js';
 
 const RISK_LABEL = { 'r-faible': 'Faible', 'r-moyen': 'Modéré', 'r-eleve': 'Élevé', 'r-critique': 'Critique' };
-const CLASSES_RISQUE = ['r-faible', 'r-moyen', 'r-eleve', 'r-critique'];
 const NB_PREFECTURES_CLASSEMENT = 8;
+
+/* Carte dessinee au niveau prefecture (34 formes), donnees reelles
+   disponibles au niveau region (8 regions). Chaque prefecture d'une meme
+   region affiche donc les memes stats regionales reelles -- pas de
+   granularite prefecture inventee. Une region sans client dans le dataset
+   actif reste grise ("indisponible"), jamais coloree au hasard. */
+function classePourRisque(risqueMoyenPct) {
+  if (risqueMoyenPct >= 60) return 'r-critique';
+  if (risqueMoyenPct >= 35) return 'r-eleve';
+  if (risqueMoyenPct >= 15) return 'r-moyen';
+  return 'r-faible';
+}
 
 export function initMap() {
   const mapTooltip = document.getElementById('mapTooltip');
@@ -18,17 +30,36 @@ export function initMap() {
 
   const allPrefPaths = Array.from(document.querySelectorAll('#gnMap path.region-shape'));
 
-  // Statistiques fictives precalculees une fois -- deterministes par
-  // prefecture, contraintes a la tranche de risque deja peinte sur la
-  // carte (voir regional-stats.js).
-  const statsParPrefecture = new Map();
-  allPrefPaths.forEach(path => {
-    const riskCls = CLASSES_RISQUE.find(c => path.classList.contains(c));
-    statsParPrefecture.set(path.dataset.pref, genererStatsPrefecture(path.dataset.pref, riskCls));
-  });
-
+  let statsParRegion = new Map(); // region normalisee -> stats reelles (ou absente si pas de donnees)
   let filtreActif = 'tous';
   let prefectureSelectionnee = null;
+
+  function statsPourPath(path) {
+    return statsParRegion.get(normaliserNomRegion(path.dataset.region)) || null;
+  }
+
+  function recalculerStats() {
+    const { etat } = obtenirEtatRoster();
+    if (etat !== 'pret') {
+      statsParRegion = new Map();
+    } else {
+      const parRegion = regrouperClientsParRegion(obtenirRoster());
+      statsParRegion = new Map();
+      for (const [region, clients] of parRegion) {
+        statsParRegion.set(region, calculerStatsRegion(clients));
+      }
+    }
+
+    allPrefPaths.forEach(path => {
+      const stats = statsPourPath(path);
+      path.classList.remove('r-faible', 'r-moyen', 'r-eleve', 'r-critique', 'r-indisponible');
+      path.classList.add(stats ? classePourRisque(stats.risqueMoyen) : 'r-indisponible');
+    });
+
+    reinitialiserSelection();
+    appliquerFiltre(filtreActif);
+    construireClassement();
+  }
 
   function positionnerTooltip(evt) {
     const conteneur = mapTooltip.parentElement.getBoundingClientRect();
@@ -37,12 +68,16 @@ export function initMap() {
   }
 
   function afficherTooltip(path, evt) {
-    const stats = statsParPrefecture.get(path.dataset.pref);
-    mapTooltip.innerHTML = `
-      <div class="map-tooltip-titre">${stats.pref.toUpperCase()}</div>
-      <div class="map-tooltip-ligne">Risque ${RISK_LABEL[stats.riskCls].toLowerCase()} · <b>${stats.churn}%</b></div>
-      <div class="map-tooltip-ligne">Clients à risque · ${stats.clientsARisque.toLocaleString('fr-FR')}</div>
+    const stats = statsPourPath(path);
+    const riskCls = path.classList.contains('r-indisponible') ? null : classePourRisque(stats?.risqueMoyen ?? 0);
+    mapTooltip.innerHTML = stats ? `
+      <div class="map-tooltip-titre">${path.dataset.pref.toUpperCase()}</div>
+      <div class="map-tooltip-ligne">Risque ${RISK_LABEL[riskCls].toLowerCase()} · <b>${stats.risqueMoyen}%</b></div>
+      <div class="map-tooltip-ligne">Clients à risque · ${stats.clientsARisque.toLocaleString('fr-FR')} / ${stats.clients.toLocaleString('fr-FR')}</div>
       <div class="map-tooltip-ligne">Transactions · ${stats.transactions.toLocaleString('fr-FR')}</div>
+    ` : `
+      <div class="map-tooltip-titre">${path.dataset.pref.toUpperCase()}</div>
+      <div class="map-tooltip-ligne">Aucun client de cette région dans le dataset actif</div>
     `;
     mapTooltip.classList.add('visible');
     positionnerTooltip(evt);
@@ -53,43 +88,49 @@ export function initMap() {
   }
 
   function afficherRegionalInsight(pref) {
-    const stats = statsParPrefecture.get(pref);
-    if (!stats) return;
+    const path = allPrefPaths.find(p => p.dataset.pref === pref);
+    if (!path) return;
+    const stats = statsPourPath(path);
     prefectureSelectionnee = pref;
 
     regionalInsightEmpty.style.display = 'none';
     mapInfoCard.classList.add('active');
 
-    const d = stats.distribution;
-    regionalInsightBody.innerHTML = `
-      <div class="map-info-head">
-        <span class="pname">${stats.pref}</span>
-        <span class="rname">RISQUE <span style="color:${couleurPourClasseCarte(stats.riskCls)};">${RISK_LABEL[stats.riskCls].toUpperCase()}</span></span>
-      </div>
-      <div class="map-info-grid" style="margin-bottom:20px;">
-        <div class="map-info-stat"><div class="v">${stats.clients.toLocaleString('fr-FR')}</div><div class="l">Clients</div></div>
-        <div class="map-info-stat"><div class="v">${stats.clientsARisque.toLocaleString('fr-FR')}</div><div class="l">Clients à risque</div></div>
-        <div class="map-info-stat"><div class="v">${stats.churn}%</div><div class="l">Risque moyen</div></div>
-        <div class="map-info-stat"><div class="v">${stats.echec}%</div><div class="l">Taux d'échec</div></div>
-      </div>
+    if (!stats) {
+      regionalInsightBody.innerHTML = `
+        <div class="map-info-head"><span class="pname">${path.dataset.pref}</span></div>
+        <div class="map-info-empty">Aucun client de la région ${path.dataset.region} dans le dataset actif.</div>
+      `;
+    } else {
+      const riskCls = classePourRisque(stats.risqueMoyen);
+      const d = stats.distribution;
+      regionalInsightBody.innerHTML = `
+        <div class="map-info-head">
+          <span class="pname">${path.dataset.region}</span>
+          <span class="rname">RISQUE <span style="color:${couleurPourClasseCarte(riskCls)};">${RISK_LABEL[riskCls].toUpperCase()}</span></span>
+        </div>
+        <div class="map-info-grid" style="margin-bottom:20px;">
+          <div class="map-info-stat"><div class="v">${stats.clients.toLocaleString('fr-FR')}</div><div class="l">Clients</div></div>
+          <div class="map-info-stat"><div class="v">${stats.clientsARisque.toLocaleString('fr-FR')}</div><div class="l">Clients à risque</div></div>
+          <div class="map-info-stat"><div class="v">${stats.risqueMoyen}%</div><div class="l">Risque moyen</div></div>
+          <div class="map-info-stat"><div class="v">${stats.transactions.toLocaleString('fr-FR')}</div><div class="l">Transactions</div></div>
+        </div>
 
-      <div class="regional-subhead">DISTRIBUTION (FICTIF)</div>
-      <div class="factor-row"><div class="factor-lbl"><span>Critique</span><span>${d.critique}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.critique}%;background:var(--risk-critique);"></div></div></div>
-      <div class="factor-row"><div class="factor-lbl"><span>Élevé</span><span>${d.eleve}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.eleve}%;background:var(--risk-eleve);"></div></div></div>
-      <div class="factor-row"><div class="factor-lbl"><span>Modéré</span><span>${d.modere}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.modere}%;background:var(--risk-modere);"></div></div></div>
-      <div class="factor-row"><div class="factor-lbl"><span>Faible</span><span>${d.faible}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.faible}%;background:var(--risk-faible);"></div></div></div>
+        <div class="regional-subhead">DISTRIBUTION DU RISQUE</div>
+        <div class="factor-row"><div class="factor-lbl"><span>Critique</span><span>${d.critique}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.critique}%;background:var(--risk-critique);"></div></div></div>
+        <div class="factor-row"><div class="factor-lbl"><span>Élevé</span><span>${d.eleve}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.eleve}%;background:var(--risk-eleve);"></div></div></div>
+        <div class="factor-row"><div class="factor-lbl"><span>Modéré</span><span>${d.modere}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.modere}%;background:var(--risk-modere);"></div></div></div>
+        <div class="factor-row"><div class="factor-lbl"><span>Faible</span><span>${d.faible}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${d.faible}%;background:var(--risk-faible);"></div></div></div>
 
-      <div class="regional-subhead" style="margin-top:20px;">CAUSES (FICTIF)</div>
-      ${stats.causes.map(c => `
-        <div class="factor-row"><div class="factor-lbl"><span>${c.libelle}</span><span>${c.pct}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${c.pct}%;"></div></div></div>
-      `).join('')}
-
-      <div class="reco-card" style="margin-top:18px;">
-        <b>Action CRM recommandée</b>
-        <div class="why">Cause dominante : ${stats.causeDominante.libelle} (${stats.causeDominante.pct}%) → <b style="color:var(--ink);">${stats.action}</b><br>Ne préjuge pas d'un impact chiffré -- aucun historique de campagne ne permet de l'estimer.</div>
-      </div>
-    `;
-    animateBarsIn(regionalInsightBody.querySelectorAll('.factor-fill'));
+        ${stats.causes.length ? `
+          <div class="regional-subhead" style="margin-top:20px;">CAUSES DOMINANTES (règle Next Best Action)</div>
+          ${stats.causes.map(c => `
+            <div class="factor-row"><div class="factor-lbl"><span>${c.libelle}</span><span>${c.pct}%</span></div><div class="factor-track"><div class="factor-fill" style="width:${c.pct}%;"></div></div></div>
+          `).join('')}
+        ` : ''}
+      `;
+      animateBarsIn(regionalInsightBody.querySelectorAll('.factor-fill'));
+    }
 
     allPrefPaths.forEach(p => {
       const estSelectionnee = p.dataset.pref === pref;
@@ -120,18 +161,32 @@ export function initMap() {
 
   function construireClassement() {
     if (!mapRanking) return;
-    const classees = Array.from(statsParPrefecture.values())
-      .sort((a, b) => b.churn - a.churn)
-      .slice(0, NB_PREFECTURES_CLASSEMENT);
-    mapRanking.innerHTML = classees.map((s, i) => `
+    const vues = new Set();
+    const classees = [];
+    allPrefPaths.forEach(path => {
+      const region = path.dataset.region;
+      if (vues.has(region)) return;
+      const stats = statsPourPath(path);
+      if (!stats) return;
+      vues.add(region);
+      classees.push({ pref: region, riskCls: classePourRisque(stats.risqueMoyen), risqueMoyen: stats.risqueMoyen });
+    });
+    classees.sort((a, b) => b.risqueMoyen - a.risqueMoyen);
+    const top = classees.slice(0, NB_PREFECTURES_CLASSEMENT);
+
+    mapRanking.innerHTML = top.length ? top.map((s, i) => `
       <div class="ranking-row" data-pref="${s.pref}" tabindex="0" role="button" aria-label="Voir l'analyse de ${s.pref}">
         <span class="ranking-rang">${String(i + 1).padStart(2, '0')}</span>
         <span class="ranking-nom">${s.pref}</span>
-        <span class="ranking-valeur" style="color:${couleurPourClasseCarte(s.riskCls)};">${s.churn}%</span>
+        <span class="ranking-valeur" style="color:${couleurPourClasseCarte(s.riskCls)};">${s.risqueMoyen}%</span>
       </div>
-    `).join('');
+    `).join('') : `<div class="map-info-empty">Aucune région exploitable dans le dataset actif.</div>`;
+
     mapRanking.querySelectorAll('.ranking-row').forEach(row => {
-      const ouvrir = () => afficherRegionalInsight(row.dataset.pref);
+      const ouvrir = () => {
+        const path = allPrefPaths.find(p => p.dataset.region === row.dataset.pref);
+        if (path) afficherRegionalInsight(path.dataset.pref);
+      };
       row.addEventListener('click', ouvrir);
       row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ouvrir(); } });
     });
@@ -158,5 +213,6 @@ export function initMap() {
     });
   }
 
-  construireClassement();
+  recalculerStats();
+  document.addEventListener('roster:ready', recalculerStats);
 }

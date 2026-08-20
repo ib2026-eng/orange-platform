@@ -46,6 +46,8 @@
 .region-shape.r-moyen{fill:var(--r1);}
 .region-shape.r-eleve{fill:var(--r2);}
 .region-shape.r-critique{fill:var(--r3);}
+.region-shape.r-indisponible{fill:var(--line);cursor:default;}
+.region-shape.r-indisponible:hover{stroke:var(--paper);stroke-width:1;transform:none;filter:none;}
 .map-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:16px;background:var(--line);border:1px solid var(--line);}
 @media (max-width:760px){.map-labels{grid-template-columns:repeat(2,1fr);}}
 .map-label{background:var(--paper);padding:9px 12px;font-size:12px;}

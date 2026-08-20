@@ -72,7 +72,6 @@
           <span><span class="seg-dot" style="background:var(--risk-critique);"></span>Critique</span>
         </div>
       </div>
-      <div class="fictif-banner">⚠ EXEMPLE FICTIF — aucun Churn_Label ni champ région fiable disponible actuellement. Ces pourcentages illustrent uniquement le rendu visuel final ; à remplacer par les vraies valeurs dès réception de l'historique 3 mois.</div>
 
       <div class="map-filters" id="mapFilters">
         <button type="button" class="map-filter-btn active" data-filtre="tous">Tous</button>
@@ -121,9 +120,9 @@
 </svg>
       <div class="map-tooltip" id="mapTooltip"></div>
 
-      <div style="font-size:11px;color:var(--grey);margin-top:12px;line-height:1.5;">Contours réels (34 préfectures, tracé officiel) — les indicateurs affichés au clic restent des exemples fictifs tant que <b style="color:var(--orange);">Churn_Label</b> et l'historique 3 mois ne sont pas disponibles.</div>
+      <div style="font-size:11px;color:var(--grey);margin-top:12px;line-height:1.5;">Contours réels (34 préfectures, tracé officiel) — indicateurs calculés à partir des clients réels du dataset actif, regroupés par région (le dataset ne fournit pas de granularité préfecture). Score de risque <b style="color:var(--orange);">prédit par le modèle</b>, pas un taux de churn observé.</div>
 
-      <div class="panel-label" style="margin-top:22px;">RÉGIONS LES PLUS À RISQUE <span style="text-transform:none; font-weight:400; color:var(--grey);">(fictif)</span></div>
+      <div class="panel-label" style="margin-top:22px;">RÉGIONS LES PLUS À RISQUE</div>
       <div id="mapRanking"></div>
     </div>
 
