@@ -4,7 +4,7 @@ de ces endpoints ne modifie ni ne remplace les routes existantes."""
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from ....core.config import get_settings
-from ..scoring import niveau_risque, score_risque
+from ..scoring import niveau_risque, score_risque_batch
 from .aggregator import (
     agreger_transactions_par_client,
     construire_serie_mensuelle,
@@ -16,7 +16,6 @@ from .apercu import construire_apercu
 from .parsers import FormatNonSupporte, parser_fichier
 from .pipeline import executer_pipeline
 from .schemas import TypeDataset
-from .scoring_input import normaliser_montant_pour_scoring
 from .store import StatutImport, get_magasin
 
 router = APIRouter(prefix="/data", tags=["ingestion"])
@@ -156,15 +155,9 @@ def clients_dataset_actif():
         )
 
     settings = get_settings()
-    montants_tries = sorted(c["montant_moyen"] for c in clients_agreges)
+    probas = score_risque_batch(clients_agreges, settings.modele_reel_disponible)
     resultats = []
-    for client in clients_agreges:
-        champs_scoring = {k: v for k, v in client.items() if k not in ("id", "region")}
-        # Normalise l'ENTREE (pas la table figee, jamais modifiee) par rang
-        # percentile dans le dataset actif -- voir scoring_input.py pour le
-        # detail du probleme et du correctif.
-        champs_scoring["montant_moyen"] = normaliser_montant_pour_scoring(client["montant_moyen"], montants_tries)
-        proba = score_risque(champs_scoring, settings.modele_reel_disponible)
+    for client, proba in zip(clients_agreges, probas):
         resultats.append({
             **client,
             "probabilite_churn": proba,

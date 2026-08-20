@@ -4,3 +4,6 @@ pandas
 pydantic
 python-multipart
 openpyxl
+xgboost
+scikit-learn
+joblib

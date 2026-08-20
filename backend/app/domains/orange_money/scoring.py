@@ -1,18 +1,28 @@
-"""Logique de scoring Orange Money -- portage fidele des fonctions de
-orange-money-source/orange_money_deploiement/api_om_churn.py. Le comportement
-(entrees -> sorties) doit rester identique a la reference."""
-from .reference_table import TABLE_MONTANT_MOYEN
+"""Logique de scoring Orange Money.
+
+v1 : execute directement le vrai modele entraine (XGBClassifier, 2
+variables) via les artefacts serialises (model_files/*.pkl) -- plus
+d'approximation par table de correspondance. Voir reference_table.py pour
+les metadonnees (version, variables, AUC)."""
+from pathlib import Path
+
+import joblib
+import pandas as pd
+
+from .reference_table import VARIABLES_MODELE
+
+_DOSSIER_MODELE = Path(__file__).parent / "model_files"
+_modele = joblib.load(_DOSSIER_MODELE / "modele_churn_om_reel.pkl")
+_scaler = joblib.load(_DOSSIER_MODELE / "scaler_om_reel.pkl")
 
 
-def score_modele_reel(montant_moyen: float) -> float:
-    """Reproduit les predictions du modele reel (Random Forest, montant_moyen,
-    AUC 0.60) via une table de correspondance construite a partir des quantiles
-    de la population d'entrainement -- equivalent fonctionnel au modele .pkl,
-    sans dependre du fichier binaire."""
-    for borne_min, borne_max, proba in TABLE_MONTANT_MOYEN:
-        if borne_min <= montant_moyen < borne_max:
-            return proba
-    return TABLE_MONTANT_MOYEN[-1][2]
+def score_modele_reel(montant_moyen: float, total_transactions: float) -> float:
+    """Execute le vrai modele XGBoost -- VARIABLES_MODELE fixe l'ordre exact
+    des colonnes attendu par le scaler/modele entraines."""
+    valeurs = {"montant_moyen": montant_moyen or 0, "total_transactions": total_transactions or 0}
+    entree = pd.DataFrame([[valeurs[nom] for nom in VARIABLES_MODELE]], columns=VARIABLES_MODELE)
+    entree_normalisee = _scaler.transform(entree)
+    return float(_modele.predict_proba(entree_normalisee)[0][1])
 
 
 def score_risque_placeholder(row: dict) -> float:
@@ -35,8 +45,28 @@ def score_risque_placeholder(row: dict) -> float:
 def score_risque(row: dict, modele_reel_disponible: bool) -> float:
     if modele_reel_disponible:
         montant_moyen = row.get('montant_moyen', 0)
-        return round(score_modele_reel(montant_moyen), 4)
+        total_transactions = row.get('total_transactions', 0)
+        return round(score_modele_reel(montant_moyen, total_transactions), 4)
     return score_risque_placeholder(row)
+
+
+def score_risque_batch(rows: list, modele_reel_disponible: bool) -> list:
+    """Equivalent de [score_risque(r, ...) for r in rows], mais un seul
+    appel au modele pour tout le lot (au lieu d'un appel Python + un
+    DataFrame par client) -- indispensable pour rester rapide sur de gros
+    datasets reels (des centaines de milliers de clients). Memes resultats
+    que la version ligne par ligne, juste vectorisee."""
+    if not rows:
+        return []
+    if not modele_reel_disponible:
+        return [score_risque_placeholder(r) for r in rows]
+    entree = pd.DataFrame(
+        [[r.get('montant_moyen', 0) or 0, r.get('total_transactions', 0) or 0] for r in rows],
+        columns=VARIABLES_MODELE,
+    )
+    entree_normalisee = _scaler.transform(entree)
+    probas = _modele.predict_proba(entree_normalisee)[:, 1]
+    return [round(float(p), 4) for p in probas]
 
 
 def niveau_risque(proba: float) -> str:

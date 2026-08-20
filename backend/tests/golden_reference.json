@@ -1,90 +1,369 @@
 {
-  "_provenance": "Valeurs generees en interrogeant orange-money-source/orange_money_deploiement/api_om_churn.py (lecture seule, non modifie). Sert de reference figee pour detecter toute regression sans dependre du depot externe en CI.",
+  "_provenance": "Valeurs regenerees contre le modele v1 (XGBoost, montant_moyen + total_transactions, AUC 0.6538) reellement charge via model_files/*.pkl -- pas une approximation par table. Changement de version volontaire du modele reel (v0 -> v1), valide explicitement, capture le 2026-08-20.",
   "golden_unitaires": [
     {
-      "payload": {"montant_moyen": 0, "total_transactions": 18, "montant_total": 2500000, "nb_types_service": 3, "jours_inactivite_avant_mars": 8},
-      "attendu": {"probabilite_churn": 0.1386, "prediction_churn": 0, "niveau_risque": "Faible", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 0,
+        "total_transactions": 18,
+        "montant_total": 2500000,
+        "nb_types_service": 3,
+        "jours_inactivite_avant_mars": 8
+      },
+      "attendu": {
+        "probabilite_churn": 0.2504,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 979.99},
-      "attendu": {"probabilite_churn": 0.1386, "prediction_churn": 0, "niveau_risque": "Faible", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 979.99
+      },
+      "attendu": {
+        "probabilite_churn": 0.1877,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 980},
-      "attendu": {"probabilite_churn": 0.3766, "prediction_churn": 0, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 980
+      },
+      "attendu": {
+        "probabilite_churn": 0.1877,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 1499.99},
-      "attendu": {"probabilite_churn": 0.3766, "prediction_churn": 0, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 1499.99
+      },
+      "attendu": {
+        "probabilite_churn": 0.1556,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 100000},
-      "attendu": {"probabilite_churn": 0.5321, "prediction_churn": 1, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 100000
+      },
+      "attendu": {
+        "probabilite_churn": 0.1864,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 100999.99},
-      "attendu": {"probabilite_churn": 0.5321, "prediction_churn": 1, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 100999.99
+      },
+      "attendu": {
+        "probabilite_churn": 0.2065,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 101000},
-      "attendu": {"probabilite_churn": 0.7181, "prediction_churn": 1, "niveau_risque": "Critique", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 101000
+      },
+      "attendu": {
+        "probabilite_churn": 0.2065,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 2451323.99},
-      "attendu": {"probabilite_churn": 0.5907, "prediction_churn": 1, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 2451323.99
+      },
+      "attendu": {
+        "probabilite_churn": 0.218,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 2451324},
-      "attendu": {"probabilite_churn": 0.5907, "prediction_churn": 1, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 2451324
+      },
+      "attendu": {
+        "probabilite_churn": 0.218,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 999999999},
-      "attendu": {"probabilite_churn": 0.5907, "prediction_churn": 1, "niveau_risque": "Élevé", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 999999999
+      },
+      "attendu": {
+        "probabilite_churn": 0.1881,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     },
     {
-      "payload": {"montant_moyen": 138000, "total_transactions": 63, "montant_total": 8694000, "nb_types_service": 5, "jours_inactivite_avant_mars": 0},
-      "attendu": {"probabilite_churn": 0.6146, "prediction_churn": 1, "niveau_risque": "Critique", "modele_reel": true, "note_fiabilite": "Signal réel modeste (AUC 0.60) -- ne pas utiliser seul pour des décisions commerciales fermes"}
+      "payload": {
+        "montant_moyen": 138000,
+        "total_transactions": 63,
+        "montant_total": 8694000,
+        "nb_types_service": 5,
+        "jours_inactivite_avant_mars": 0
+      },
+      "attendu": {
+        "probabilite_churn": 0.8264,
+        "prediction_churn": 1,
+        "niveau_risque": "Critique",
+        "modele_reel": true,
+        "note_fiabilite": "Signal réel modeste (AUC 0.6538) -- ne pas utiliser seul pour des décisions commerciales fermes"
+      }
     }
   ],
   "batch_payload": {
     "clients": [
-      {"total_transactions": 7, "nb_types_service": 3, "jours_inactivite_avant_mars": 11, "montant_moyen": 4133, "montant_total": 33064},
-      {"total_transactions": 14, "nb_types_service": 6, "jours_inactivite_avant_mars": 22, "montant_moyen": 8266, "montant_total": 123990},
-      {"total_transactions": 21, "nb_types_service": 1, "jours_inactivite_avant_mars": 33, "montant_moyen": 12399, "montant_total": 272778},
-      {"total_transactions": 28, "nb_types_service": 4, "jours_inactivite_avant_mars": 44, "montant_moyen": 16532, "montant_total": 479428},
-      {"total_transactions": 35, "nb_types_service": 7, "jours_inactivite_avant_mars": 55, "montant_moyen": 20665, "montant_total": 743940},
-      {"total_transactions": 42, "nb_types_service": 2, "jours_inactivite_avant_mars": 66, "montant_moyen": 24798, "montant_total": 1066314},
-      {"total_transactions": 4, "nb_types_service": 5, "jours_inactivite_avant_mars": 77, "montant_moyen": 28931, "montant_total": 144655},
-      {"total_transactions": 11, "nb_types_service": 0, "jours_inactivite_avant_mars": 88, "montant_moyen": 33064, "montant_total": 396768},
-      {"total_transactions": 18, "nb_types_service": 3, "jours_inactivite_avant_mars": 8, "montant_moyen": 37197, "montant_total": 706743},
-      {"total_transactions": 25, "nb_types_service": 6, "jours_inactivite_avant_mars": 19, "montant_moyen": 41330, "montant_total": 1074580},
-      {"total_transactions": 32, "nb_types_service": 1, "jours_inactivite_avant_mars": 30, "montant_moyen": 45463, "montant_total": 1500279},
-      {"total_transactions": 39, "nb_types_service": 4, "jours_inactivite_avant_mars": 41, "montant_moyen": 49596, "montant_total": 1983840}
+      {
+        "total_transactions": 7,
+        "nb_types_service": 3,
+        "jours_inactivite_avant_mars": 11,
+        "montant_moyen": 4133,
+        "montant_total": 33064
+      },
+      {
+        "total_transactions": 14,
+        "nb_types_service": 6,
+        "jours_inactivite_avant_mars": 22,
+        "montant_moyen": 8266,
+        "montant_total": 123990
+      },
+      {
+        "total_transactions": 21,
+        "nb_types_service": 1,
+        "jours_inactivite_avant_mars": 33,
+        "montant_moyen": 12399,
+        "montant_total": 272778
+      },
+      {
+        "total_transactions": 28,
+        "nb_types_service": 4,
+        "jours_inactivite_avant_mars": 44,
+        "montant_moyen": 16532,
+        "montant_total": 479428
+      },
+      {
+        "total_transactions": 35,
+        "nb_types_service": 7,
+        "jours_inactivite_avant_mars": 55,
+        "montant_moyen": 20665,
+        "montant_total": 743940
+      },
+      {
+        "total_transactions": 42,
+        "nb_types_service": 2,
+        "jours_inactivite_avant_mars": 66,
+        "montant_moyen": 24798,
+        "montant_total": 1066314
+      },
+      {
+        "total_transactions": 4,
+        "nb_types_service": 5,
+        "jours_inactivite_avant_mars": 77,
+        "montant_moyen": 28931,
+        "montant_total": 144655
+      },
+      {
+        "total_transactions": 11,
+        "nb_types_service": 0,
+        "jours_inactivite_avant_mars": 88,
+        "montant_moyen": 33064,
+        "montant_total": 396768
+      },
+      {
+        "total_transactions": 18,
+        "nb_types_service": 3,
+        "jours_inactivite_avant_mars": 8,
+        "montant_moyen": 37197,
+        "montant_total": 706743
+      },
+      {
+        "total_transactions": 25,
+        "nb_types_service": 6,
+        "jours_inactivite_avant_mars": 19,
+        "montant_moyen": 41330,
+        "montant_total": 1074580
+      },
+      {
+        "total_transactions": 32,
+        "nb_types_service": 1,
+        "jours_inactivite_avant_mars": 30,
+        "montant_moyen": 45463,
+        "montant_total": 1500279
+      },
+      {
+        "total_transactions": 39,
+        "nb_types_service": 4,
+        "jours_inactivite_avant_mars": 41,
+        "montant_moyen": 49596,
+        "montant_total": 1983840
+      }
     ]
   },
   "batch_attendu": {
     "nb_clients": 12,
-    "nb_a_risque": 11,
+    "nb_a_risque": 6,
     "modele_reel": true,
     "resultats": [
-      {"total_transactions": 7, "nb_types_service": 3, "jours_inactivite_avant_mars": 11, "montant_moyen": 4133, "montant_total": 33064, "probabilite_churn": 0.5552, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 14, "nb_types_service": 6, "jours_inactivite_avant_mars": 22, "montant_moyen": 8266, "montant_total": 123990, "probabilite_churn": 0.503, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 21, "nb_types_service": 1, "jours_inactivite_avant_mars": 33, "montant_moyen": 12399, "montant_total": 272778, "probabilite_churn": 0.4921, "prediction_churn": 0, "niveau_risque": "Élevé"},
-      {"total_transactions": 28, "nb_types_service": 4, "jours_inactivite_avant_mars": 44, "montant_moyen": 16532, "montant_total": 479428, "probabilite_churn": 0.5644, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 35, "nb_types_service": 7, "jours_inactivite_avant_mars": 55, "montant_moyen": 20665, "montant_total": 743940, "probabilite_churn": 0.5476, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 42, "nb_types_service": 2, "jours_inactivite_avant_mars": 66, "montant_moyen": 24798, "montant_total": 1066314, "probabilite_churn": 0.5476, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 4, "nb_types_service": 5, "jours_inactivite_avant_mars": 77, "montant_moyen": 28931, "montant_total": 144655, "probabilite_churn": 0.5467, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 11, "nb_types_service": 0, "jours_inactivite_avant_mars": 88, "montant_moyen": 33064, "montant_total": 396768, "probabilite_churn": 0.547, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 18, "nb_types_service": 3, "jours_inactivite_avant_mars": 8, "montant_moyen": 37197, "montant_total": 706743, "probabilite_churn": 0.547, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 25, "nb_types_service": 6, "jours_inactivite_avant_mars": 19, "montant_moyen": 41330, "montant_total": 1074580, "probabilite_churn": 0.564, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 32, "nb_types_service": 1, "jours_inactivite_avant_mars": 30, "montant_moyen": 45463, "montant_total": 1500279, "probabilite_churn": 0.5629, "prediction_churn": 1, "niveau_risque": "Élevé"},
-      {"total_transactions": 39, "nb_types_service": 4, "jours_inactivite_avant_mars": 41, "montant_moyen": 49596, "montant_total": 1983840, "probabilite_churn": 0.5629, "prediction_churn": 1, "niveau_risque": "Élevé"}
+      {
+        "total_transactions": 7,
+        "nb_types_service": 3,
+        "jours_inactivite_avant_mars": 11,
+        "montant_moyen": 4133,
+        "montant_total": 33064,
+        "probabilite_churn": 0.2569,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré"
+      },
+      {
+        "total_transactions": 14,
+        "nb_types_service": 6,
+        "jours_inactivite_avant_mars": 22,
+        "montant_moyen": 8266,
+        "montant_total": 123990,
+        "probabilite_churn": 0.3576,
+        "prediction_churn": 0,
+        "niveau_risque": "Élevé"
+      },
+      {
+        "total_transactions": 21,
+        "nb_types_service": 1,
+        "jours_inactivite_avant_mars": 33,
+        "montant_moyen": 12399,
+        "montant_total": 272778,
+        "probabilite_churn": 0.3051,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré"
+      },
+      {
+        "total_transactions": 28,
+        "nb_types_service": 4,
+        "jours_inactivite_avant_mars": 44,
+        "montant_moyen": 16532,
+        "montant_total": 479428,
+        "probabilite_churn": 0.7594,
+        "prediction_churn": 1,
+        "niveau_risque": "Critique"
+      },
+      {
+        "total_transactions": 35,
+        "nb_types_service": 7,
+        "jours_inactivite_avant_mars": 55,
+        "montant_moyen": 20665,
+        "montant_total": 743940,
+        "probabilite_churn": 0.5706,
+        "prediction_churn": 1,
+        "niveau_risque": "Élevé"
+      },
+      {
+        "total_transactions": 42,
+        "nb_types_service": 2,
+        "jours_inactivite_avant_mars": 66,
+        "montant_moyen": 24798,
+        "montant_total": 1066314,
+        "probabilite_churn": 0.5986,
+        "prediction_churn": 1,
+        "niveau_risque": "Élevé"
+      },
+      {
+        "total_transactions": 4,
+        "nb_types_service": 5,
+        "jours_inactivite_avant_mars": 77,
+        "montant_moyen": 28931,
+        "montant_total": 144655,
+        "probabilite_churn": 0.3427,
+        "prediction_churn": 0,
+        "niveau_risque": "Modéré"
+      },
+      {
+        "total_transactions": 11,
+        "nb_types_service": 0,
+        "jours_inactivite_avant_mars": 88,
+        "montant_moyen": 33064,
+        "montant_total": 396768,
+        "probabilite_churn": 0.4132,
+        "prediction_churn": 0,
+        "niveau_risque": "Élevé"
+      },
+      {
+        "total_transactions": 18,
+        "nb_types_service": 3,
+        "jours_inactivite_avant_mars": 8,
+        "montant_moyen": 37197,
+        "montant_total": 706743,
+        "probabilite_churn": 0.426,
+        "prediction_churn": 0,
+        "niveau_risque": "Élevé"
+      },
+      {
+        "total_transactions": 25,
+        "nb_types_service": 6,
+        "jours_inactivite_avant_mars": 19,
+        "montant_moyen": 41330,
+        "montant_total": 1074580,
+        "probabilite_churn": 0.8261,
+        "prediction_churn": 1,
+        "niveau_risque": "Critique"
+      },
+      {
+        "total_transactions": 32,
+        "nb_types_service": 1,
+        "jours_inactivite_avant_mars": 30,
+        "montant_moyen": 45463,
+        "montant_total": 1500279,
+        "probabilite_churn": 0.9083,
+        "prediction_churn": 1,
+        "niveau_risque": "Critique"
+      },
+      {
+        "total_transactions": 39,
+        "nb_types_service": 4,
+        "jours_inactivite_avant_mars": 41,
+        "montant_moyen": 49596,
+        "montant_total": 1983840,
+        "probabilite_churn": 0.6126,
+        "prediction_churn": 1,
+        "niveau_risque": "Critique"
+      }
     ]
   },
   "racine_attendu": {
     "message": "API Orange Money Customer Intelligence",
-    "statut_modele": "Modèle réel (AUC 0.60, montant_moyen)",
+    "statut_modele": "Modèle réel (AUC 0.6538, montant_moyen + total_transactions)",
     "documentation": "/docs",
-    "endpoints": ["POST /predire_churn", "POST /predire_churn_batch"]
+    "endpoints": [
+      "POST /predire_churn",
+      "POST /predire_churn_batch"
+    ]
   }
 }

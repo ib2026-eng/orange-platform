@@ -2,8 +2,11 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field
 
-# Colonnes attendues par le modele -- reprises telles quelles de la reference
-# (declarees mais non utilisees dans la logique, a titre documentaire).
+# Colonnes acceptees par ClientOM (Customer 360 agrege). Seules
+# montant_moyen et total_transactions sont reellement utilisees par le
+# modele reel v1 (voir reference_table.py:VARIABLES_MODELE) ; les autres
+# restent acceptees pour compatibilite et usage futur, mais n'influencent
+# pas le score.
 COLONNES_MODELE = [
     'total_transactions', 'montant_total', 'montant_moyen',
     'nb_types_service', 'jours_inactivite_avant_mars',
