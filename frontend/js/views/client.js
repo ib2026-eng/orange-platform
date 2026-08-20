@@ -124,7 +124,7 @@ function render() {
     message.innerHTML = `<div class="map-info-empty">Client « ${id} » introuvable dans le dataset actif. Essayez un identifiant de l'onglet "Clients à risque".</div>`;
     return;
   }
-  afficherFiche(client, message, contenu, distributionsPourRoster(roster));
+  afficherFiche(client, message, contenu, distributionsPourRoster(obtenirRoster()));
 }
 
 function rechercher() {
