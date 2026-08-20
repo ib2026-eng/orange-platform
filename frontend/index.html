@@ -176,7 +176,6 @@
   <!-- CLIENTS À RISQUE -->
   <div class="view" id="list">
     <div class="view-header"><h1>Clients à risque</h1><p>Liste priorisée, causes et actions recommandées</p></div>
-    <div class="honesty"><b>API réelle connectée —</b> les clients du dataset actif sont scorés par une API réelle (FastAPI, déployée) : modèle réel (baseline v0, montant_moyen, AUC 0.60) si disponible, sinon règle simple documentée en repli.</div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <span class="panel-label" style="margin-bottom:0;">CLIENTS À RISQUE — SCORE, CAUSE, RECOMMANDATION, PRIORITÉ</span>
@@ -274,7 +273,6 @@
   <!-- LOCKED -->
   <div class="view" id="locked">
     <div class="view-header"><h1>Next Best Action</h1><p>Actions de rétention par cause et priorité</p></div>
-    <div class="honesty" id="nbaHonesty"><b>Next Best Action — V1 (règles déterministes) —</b> ces recommandations sont des règles métier basées sur les signaux réellement disponibles (inactivité, valeur client, diversité de services, niveau de risque). Ce ne sont <b>pas</b> des prédictions du modèle de churn. Aucun uplift, taux de conversion ou impact commercial n'est estimé — aucun historique de campagnes ne le permettrait honnêtement.</div>
 
     <div id="nbaEmpty" class="panel"><div class="map-info-empty">Chargement des clients en cours...</div></div>
 
@@ -332,7 +330,6 @@
   <!-- DATA IMPORT -->
   <div class="view" id="import">
     <div class="view-header"><h1>Data Import</h1><p>Importer et valider vos données clients</p></div>
-    <div class="honesty"><b>Import de données —</b> le dataset validé ici devient la source active de toute la plateforme (Vue globale, Segmentation, Clients à risque, Fiche client, Next Best Action). Tant qu'aucun dataset n'est actif, ces vues affichent un état vide.</div>
 
     <div class="panel" id="importDropzonePanel">
       <span class="panel-label">IMPORTER LES DONNÉES ORANGE MONEY</span>

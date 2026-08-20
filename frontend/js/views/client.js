@@ -107,9 +107,15 @@ function render() {
     return;
   }
 
-  const roster = obtenirRoster();
-  const id = dernierIdRecherche || [...roster].sort((a, b) => b.probabilite_churn - a.probabilite_churn)[0]?.id;
-  if (input && !input.value) input.value = id || '';
+  if (!dernierIdRecherche) {
+    contenu.style.display = 'none';
+    message.style.display = '';
+    message.innerHTML = `<div class="map-info-empty">Recherchez un identifiant client, ou sélectionnez-en un depuis l'onglet "Clients à risque".</div>`;
+    return;
+  }
+
+  const id = dernierIdRecherche;
+  if (input && !input.value) input.value = id;
 
   const client = trouverClientParId(id);
   if (!client) {
