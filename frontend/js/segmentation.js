@@ -12,7 +12,7 @@ export const CHAMPS_REQUIS_RFM = ['jours_inactivite_avant_mars', 'total_transact
 export const SEGMENTS = ['Platinum', 'Gold', 'Silver', 'Bronze'];
 
 export const DESCRIPTION_SEGMENT = {
-  Platinum: "Quartile supérieur du score RFM composite (récence + fréquence + montant + diversité) sur l'échantillon chargé.",
+  Platinum: "Quartile supérieur du score RFM composite.",
   Gold: "Deuxième quartile du score RFM composite.",
   Silver: "Troisième quartile du score RFM composite.",
   Bronze: "Quartile inférieur du score RFM composite.",
