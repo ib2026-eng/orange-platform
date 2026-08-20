@@ -19,7 +19,6 @@
     <div class="brand">
       <img src="assets/orange-logo.png" alt="Orange Guinée" class="brand-logo">
       <div class="brand-text">
-        <div class="brand-name">Orange Guinée</div>
         <div class="brand-product">Customer Intelligence</div>
       </div>
     </div>
@@ -141,7 +140,7 @@
     <div class="view-header"><h1>Fiche client</h1><p>Profil, score et recommandation par client</p></div>
 
     <div class="client-search">
-      <input type="text" id="clientSearchInput" placeholder="Rechercher un client (ex. PT240037.1001.800013)" value="PT240037.1001.800013">
+      <input type="text" id="clientSearchInput" placeholder="Rechercher un client (ex. PT240037.1001.800013)">
       <button id="clientSearchBtn" type="button">Rechercher</button>
     </div>
 
@@ -155,18 +154,21 @@
       </div>
       <div class="panel">
         <span class="panel-label">RISQUE CHURN</span>
-        <div class="health-gauge-wrap">
-          <div class="health-num" id="clientScoreNum">—</div>
-          <div>
+        <div class="score-gauge-wrap">
+          <svg class="score-ring" viewBox="0 0 140 140" width="140" height="140" aria-hidden="true">
+            <circle class="score-ring-track" cx="70" cy="70" r="60"></circle>
+            <circle class="score-ring-fill" id="clientScoreRing" cx="70" cy="70" r="60"></circle>
+          </svg>
+          <div class="score-ring-center">
+            <div class="health-num" id="clientScoreNum">—</div>
             <span class="badge" id="clientScoreBadge"></span>
-            <div style="font-size:11.5px; color:var(--grey); line-height:1.5; margin-top:6px;">Score calculé par le modèle réel connecté (v1, XGBoost, montant_moyen + total_transactions, AUC 0.6538 mesurée sur les données d'entraînement).</div>
           </div>
         </div>
 
         <div class="regional-subhead" style="margin-top:20px;">CAUSE PRINCIPALE</div>
         <div id="clientCauseCard" class="cause-highlight"></div>
 
-        <div class="regional-subhead" style="margin-top:18px;">FACTEURS CONTRIBUTIFS <span style="text-transform:none; font-weight:400;">(valeurs réelles du profil, normalisées sur l'échantillon)</span></div>
+        <div class="regional-subhead" style="margin-top:18px;">FACTEURS CONTRIBUTIFS</div>
         <div id="clientFacteurs"></div>
       </div>
     </div>

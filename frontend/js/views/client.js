@@ -1,16 +1,15 @@
 import { obtenirRoster, obtenirEtatRoster, trouverClientParId } from '../client-store.js';
 import { couleurPourCategorie } from '../risk-colors.js';
 import { getRetentionRecommendation } from '../retention.js';
-import { obtenirStatutModele } from '../model-status.js';
 import { construireDistribution, rangPercentile } from '../sample-ranges.js';
 import { animateBarsIn, animateCountUp } from '../animations.js';
 import { markupPourEtat, cablerBoutonImport } from '../empty-states.js';
 
-let statutModele = { modeleReel: null };
 let dernierIdRecherche = null;
 let distributionsCache = null; // recalculee uniquement quand le roster change (voir render()) -- pas a chaque recherche
 
 const CHAMPS_DISTRIBUTION = ['jours_inactivite_avant_mars', 'total_transactions', 'nb_types_service', 'montant_moyen'];
+const CIRCONFERENCE_ANNEAU = 2 * Math.PI * 60; // rayon 60 (voir score-ring dans index.html)
 
 function distributionsPourRoster(roster) {
   if (distributionsCache?.roster === roster) return distributionsCache.valeurs;
@@ -48,18 +47,8 @@ const TOUS_LES_FACTEURS = [
   { libelle: 'Montant moyen', cle: 'montant_moyen' },
 ];
 
-function construireFacteurs(client, modeleReel, distributions) {
-  if (modeleReel !== true) {
-    return TOUS_LES_FACTEURS.map(f => barreFacteur(client, f.libelle, f.cle, distributions)).join('');
-  }
-  const utilise = barreFacteur(client, 'Montant moyen', 'montant_moyen', distributions);
-  const autres = TOUS_LES_FACTEURS.filter(f => f.cle !== 'montant_moyen').map(f => barreFacteur(client, f.libelle, f.cle, distributions)).join('');
-  return `
-    <div style="font-size:11px;color:var(--grey);margin-bottom:6px;">Utilisé par le modèle réel actuel :</div>
-    ${utilise}
-    <div style="font-size:11px;color:var(--grey);margin:12px 0 6px;">Autres signaux disponibles (non utilisés par ce modèle) :</div>
-    ${autres}
-  `;
+function construireFacteurs(client, distributions) {
+  return TOUS_LES_FACTEURS.map(f => barreFacteur(client, f.libelle, f.cle, distributions)).join('');
 }
 
 function afficherFiche(client, message, contenu, distributions) {
@@ -76,10 +65,16 @@ function afficherFiche(client, message, contenu, distributions) {
   `;
 
   const couleur = couleurPourCategorie(client.niveau_risque);
+  const pctScore = Math.round(client.probabilite_churn * 100);
+
   const scoreNum = document.getElementById('clientScoreNum');
   scoreNum.style.color = couleur;
-  scoreNum.textContent = `${Math.round(client.probabilite_churn * 100)}%`;
+  scoreNum.textContent = `${pctScore}%`;
   animateCountUp(scoreNum);
+
+  const ring = document.getElementById('clientScoreRing');
+  ring.style.stroke = couleur;
+  ring.style.strokeDashoffset = CIRCONFERENCE_ANNEAU * (1 - pctScore / 100);
 
   const badge = document.getElementById('clientScoreBadge');
   badge.textContent = client.niveau_risque;
@@ -89,7 +84,7 @@ function afficherFiche(client, message, contenu, distributions) {
   document.getElementById('clientCauseCard').textContent = reco.cause;
 
   const facteursEl = document.getElementById('clientFacteurs');
-  facteursEl.innerHTML = construireFacteurs(client, statutModele.modeleReel, distributions);
+  facteursEl.innerHTML = construireFacteurs(client, distributions);
   animateBarsIn(facteursEl.querySelectorAll('.factor-fill'));
 }
 
@@ -137,8 +132,6 @@ export async function initFicheClient() {
   const input = document.getElementById('clientSearchInput');
   const btn = document.getElementById('clientSearchBtn');
   if (!input) return;
-
-  statutModele = await obtenirStatutModele();
 
   btn.addEventListener('click', rechercher);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') rechercher(); });
