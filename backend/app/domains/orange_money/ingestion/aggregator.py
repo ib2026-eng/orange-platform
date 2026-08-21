@@ -112,6 +112,10 @@ def agreger_transactions_par_client(lignes: List[Dict[str, Any]]) -> List[Dict[s
             "montant_total": montant_total,
             "montant_moyen": montant_moyen,
             "nb_types_service": len(types_service),
+            "services_utilises": sorted(types_service),
+            # None si le vocabulaire de `statut` n'est pas reconnu pour ce
+            # client -- jamais suppose a 0% (voir _taux_echec).
+            "taux_echec_client": _taux_echec(transactions, filtre=lambda _l: True),
         }
 
         dates_client = [d for t in transactions if (d := _parser_date(t.get(CHAMP_DATE)))]

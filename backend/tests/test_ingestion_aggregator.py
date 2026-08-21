@@ -21,6 +21,31 @@ def test_agregation_calcule_les_features_client():
     assert c1["montant_moyen"] == 1500
     assert c1["nb_types_service"] == 1
     assert c1["region"] == "Conakry"
+    assert c1["services_utilises"] == ["P2P"]
+
+
+def test_agregation_expose_le_taux_echec_par_client():
+    resultats = agreger_transactions_par_client(LIGNES)
+    c1 = next(c for c in resultats if c["id"] == "C1")
+    c2 = next(c for c in resultats if c["id"] == "C2")
+    assert c1["taux_echec_client"] == 50.0  # 1 echec sur 2 (reussie, echouee)
+    assert c2["taux_echec_client"] == 0.0  # 1 reussie sur 1
+
+
+def test_agregation_taux_echec_client_indisponible_si_statut_absent():
+    lignes = [{"client_id": "C5", "montant": "1000", "date_transaction": "2026-01-01"}]
+    resultats = agreger_transactions_par_client(lignes)
+    assert resultats[0]["taux_echec_client"] is None
+
+
+def test_agregation_expose_la_liste_triee_des_services_utilises():
+    lignes = [
+        {"client_id": "C9", "montant": "1000", "type_service": "Cashout", "date_transaction": "2026-01-01"},
+        {"client_id": "C9", "montant": "2000", "type_service": "Paiement Marchand", "date_transaction": "2026-01-02"},
+        {"client_id": "C9", "montant": "3000", "type_service": "Cashout", "date_transaction": "2026-01-03"},
+    ]
+    resultats = agreger_transactions_par_client(lignes)
+    assert resultats[0]["services_utilises"] == ["Cashout", "Paiement Marchand"]
 
 
 def test_agregation_calcule_la_recence_par_rapport_a_la_date_max_du_dataset():
